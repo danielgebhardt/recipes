@@ -47,7 +47,8 @@ public class Recipe {
 
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
-                    CascadeType.ALL
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST
             }, targetEntity = Ingredient.class)
     @JoinTable(name = "recipes_ingredients",
             joinColumns = @JoinColumn(name = "r_id",

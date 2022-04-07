@@ -3,6 +3,8 @@ package com.example.recipe;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/recipes")
 public class RecipeController {
@@ -18,7 +20,20 @@ public class RecipeController {
         return recipeService.createTheRecipe(recipe);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> readRecipe(@PathVariable long id) {
+        return recipeService.readTheRecipe(id);
+    }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Object> updateRecipe(@PathVariable long id, @RequestBody HashMap<String, Object> map) {
+        return recipeService.updateTheRecipe(id, map);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteRecipe(@PathVariable long id) {
+        return recipeService.deleteTheRecipe(id);
+    }
 
     @GetMapping
     public ResponseEntity<Object> listRecipes() {

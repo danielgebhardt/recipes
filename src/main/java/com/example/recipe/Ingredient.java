@@ -31,7 +31,7 @@ public class Ingredient {
     @Column(name = "contains_gluten")
     boolean containsGluten;
 
-    @ManyToMany(mappedBy = "ingredients", targetEntity = Recipe.class)
+    @ManyToMany(mappedBy = "ingredients", targetEntity = Recipe.class, cascade = {CascadeType.ALL})
     @JsonBackReference
     private Set<Recipe> recipes = new HashSet<>();
 
