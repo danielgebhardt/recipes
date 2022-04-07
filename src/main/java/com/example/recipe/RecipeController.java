@@ -35,8 +35,16 @@ public class RecipeController {
         return recipeService.deleteTheRecipe(id);
     }
 
-    @GetMapping
-    public ResponseEntity<Object> listRecipes() {
-        return recipeService.listTheRecipes();
+    @GetMapping(value = {"", "/{min}/{max}"})
+    public ResponseEntity<Object> listRecipes(@PathVariable(required = false) Integer min, @PathVariable(required = false) Integer max, @RequestParam(value = "sortBy", required = false, defaultValue = "") String sortBy) {
+        if(!sortBy.equals("DESC") && !sortBy.equals("ASC")) {
+            sortBy = "";
+        }
+
+        if(min != null && max != null) {
+            return recipeService.listTheRecipes(min, max, sortBy);
+        } else {
+            return recipeService.listTheRecipes(sortBy);
+        }
     }
 }

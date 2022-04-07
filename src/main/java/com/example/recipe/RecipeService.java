@@ -1,5 +1,6 @@
 package com.example.recipe;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class RecipeService {
     public ResponseEntity<Object> readTheRecipe(long id) {
         Optional<Recipe> recipe = recipeRepository.findById(id);
 
-        if(recipe.isEmpty()) {
+        if (recipe.isEmpty()) {
             return new ResponseEntity<>("Recipe Not Found", HttpStatus.NOT_FOUND);
         }
 
@@ -40,11 +41,11 @@ public class RecipeService {
     public ResponseEntity<Object> updateTheRecipe(long id, HashMap<String, Object> map) {
         Optional<Recipe> oldRecipe = recipeRepository.findById(id);
 
-        if(oldRecipe.isEmpty()) {
+        if (oldRecipe.isEmpty()) {
             return new ResponseEntity<>("Recipe Not Found", HttpStatus.NOT_FOUND);
         }
 
-        if(map.containsKey("ingredients")) {
+        if (map.containsKey("ingredients")) {
             Set<Ingredient> changedIngredients = new HashSet<>();
             ArrayList<Ingredient> arrayList = (ArrayList) map.get("ingredients");
             changedIngredients.addAll(arrayList);
@@ -54,7 +55,7 @@ public class RecipeService {
         }
 
         map.forEach((key, value) -> {
-            if(!key.equals("ingredients")) {
+            if (!key.equals("ingredients")) {
                 Field field = ReflectionUtils.findField(Recipe.class, key);
                 field.setAccessible(true);
                 ReflectionUtils.setField(field, oldRecipe.get(), value);
@@ -68,7 +69,7 @@ public class RecipeService {
     public ResponseEntity<Object> deleteTheRecipe(long id) {
         Optional<Recipe> oldRecipe = recipeRepository.findById(id);
 
-        if(oldRecipe.isEmpty()) {
+        if (oldRecipe.isEmpty()) {
             return new ResponseEntity<>("Recipe Not Found", HttpStatus.NOT_FOUND);
         }
 
@@ -76,8 +77,24 @@ public class RecipeService {
         return new ResponseEntity<>("Recipe " + id + " deleted", HttpStatus.ACCEPTED);
     }
 
-    public ResponseEntity<Object> listTheRecipes() {
-        return new ResponseEntity<>(recipeRepository.findAll(), HttpStatus.OK);
+    public ResponseEntity<Object> listTheRecipes(String sortBy) {
+        switch (sortBy) {
+            case "ASC":
+               return new ResponseEntity<>(recipeRepository.findByOrderByCaloriesAsc(), HttpStatus.OK);
+            case "DESC":
+                return new ResponseEntity<>(recipeRepository.findByOrderByCaloriesDesc(), HttpStatus.OK);
+            default:
+                return new ResponseEntity<>(recipeRepository.findAll(), HttpStatus.OK);
+        }
+    }
+
+    public ResponseEntity<Object> listTheRecipes(int min, int max, String sortBy) {
+        switch (sortBy) {
+            case "DESC":
+                return new ResponseEntity<>(recipeRepository.findAllByCaloriesBetweenOrderByCaloriesDesc(min, max), HttpStatus.OK);
+            default:
+                return new ResponseEntity<>(recipeRepository.findAllByCaloriesBetweenOrderByCaloriesAsc(min, max), HttpStatus.OK);
+        }
     }
 
 
@@ -106,7 +123,7 @@ public class RecipeService {
         Set<Ingredient> newIngredients = new HashSet<>();
 
         Iterator iterator = ingredients.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             LinkedHashMap<String, Object> shouldBeIngredient = (LinkedHashMap<String, Object>) iterator.next();
             Ingredient newIngredient = new Ingredient();
             newIngredient.setName((String) shouldBeIngredient.get("name"));
